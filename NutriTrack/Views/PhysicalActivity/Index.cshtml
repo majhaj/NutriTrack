@@ -1,0 +1,32 @@
+﻿@model IEnumerable<NutriTrackData.Entities.PhysicalActivity>
+
+<h2>Physical Activity History</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Calories Burned per Minute</th>
+            <th>Duration (minutes)</th>
+            <th>Time</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var activity in Model)
+        {
+            <tr>
+                <td>@activity.Name</td>
+                <td>@activity.CaloriesBurnedPerMinute</td>
+                <td>@activity.Duration</td>
+                <td>@activity.Time.ToString("dd-MM-yy  HH:mm")</td>
+                <td>
+                    <a href="@Url.Action("Edit", new { id = activity.Id })">Edit</a> |
+                    <a href="@Url.Action("Delete", new { id = activity.Id })">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Create")" class="btn btn-primary">Add New Activity</a>

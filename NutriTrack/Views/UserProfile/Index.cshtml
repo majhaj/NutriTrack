@@ -1,0 +1,28 @@
+﻿@model NutriTrackData.Entities.User
+
+<h1>Welcome to your profile, @Model.Name</h1>
+
+<div>
+    <h3>Your profile information</h3>
+    <table class="table">
+        <tr>
+            <th>Name</th>
+            <td>@Model.Name</td>
+        </tr>
+        <tr>
+            <th>Date of Birth</th>
+            <td>@Model.DateOfBirth.ToString("yyyy-MM-dd")</td>
+        </tr>
+        <tr>
+            <th>Weight</th>
+            <td>@Model.Weight kg</td>
+        </tr>
+        <tr>
+            <th>Height</th>
+            <td>@Model.Height cm</td>
+        </tr>
+    </table>
+
+    <a href="@Url.Action("Edit", "UserProfile")" class="btn btn-primary">Edit Profile</a>
+    <a href="@Url.Action("History", "UserProfile")" class="btn btn-secondary">Check Weight History</a>
+</div>

@@ -1,0 +1,39 @@
+﻿@model IEnumerable<NutriTrackData.Entities.Meal>
+
+<h1>Your Meals</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Calories</th>
+            <th>Time</th>
+            <th>Products</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var meal in Model)
+        {
+            <tr>
+                <td>@meal.Name</td>
+                <td>@meal.Category.Name</td>
+                <td>@meal.Calories</td>
+                <td>@meal.Time.ToString("g")</td>
+                <td>
+                    @foreach (var product in meal.MealProducts)
+                    {
+                        <div>@product.Product.Name (@product.Quantity g)</div>
+                    }
+                </td>
+                <td>
+                    <a href="@Url.Action("Edit", "Meals", new { id = meal.Id })" class="btn btn-warning">Edit</a>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Create", "Meals")" class="btn btn-primary">Add Meal</a>
