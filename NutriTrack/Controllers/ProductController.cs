@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NutriTrack.Services;
 using NutriTrackData.Entities;
 
@@ -74,6 +75,11 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Name,Calories,Protein,Carbs,Fat")] Product product)
     {
+        var products = await _productService.GetAllProductsAsync();
+        if (products.Any(p => p.Name == product.Name))
+        {
+            ModelState.AddModelError("Name", "The product name must be unique.");
+        }
         if (ModelState.IsValid)
         {
             await _productService.AddProductAsync(product);

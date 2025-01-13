@@ -9,11 +9,11 @@ using NutriTrack.Data;
 
 #nullable disable
 
-namespace NutriTrack.Data.Migrations
+namespace NutriTrackData.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250106214902_OnModelCratingPAUpdate")]
-    partial class OnModelCratingPAUpdate
+    [Migration("20250113101146_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -271,7 +271,8 @@ namespace NutriTrack.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("Time")
                         .HasColumnType("datetime2");
@@ -306,7 +307,8 @@ namespace NutriTrack.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<double>("Protein")
                         .HasColumnType("float");
@@ -501,7 +503,7 @@ namespace NutriTrack.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("NutriTrackData.Entities.Product", "Product")
-                        .WithMany()
+                        .WithMany("MealProducts")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -541,6 +543,11 @@ namespace NutriTrack.Data.Migrations
             modelBuilder.Entity("NutriTrackData.Entities.MealCategory", b =>
                 {
                     b.Navigation("Meals");
+                });
+
+            modelBuilder.Entity("NutriTrackData.Entities.Product", b =>
+                {
+                    b.Navigation("MealProducts");
                 });
 
             modelBuilder.Entity("NutriTrackData.Entities.User", b =>

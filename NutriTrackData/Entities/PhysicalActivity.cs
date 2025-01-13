@@ -16,7 +16,7 @@ namespace NutriTrackData.Entities
         public int CaloriesBurnedPerMinute { get; set; }
 
         [Required(ErrorMessage = "Duration is required")]
-        public double Duration { get; set; }
+        public int Duration { get; set; }
         public DateTime Time { get; set; } = DateTime.UtcNow;
 
         [ForeignKey("UserId")]

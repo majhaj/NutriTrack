@@ -24,11 +24,14 @@ namespace NutriTrack.Services
 
             if (existingUser == null)
             {
-                throw new  KeyNotFoundException($"User with id {currentUser.Id} not found");
+                throw new KeyNotFoundException($"User with id {currentUser.Id} not found");
             }
 
             activity.UserId = existingUser.Id;
+            activity.User = existingUser;
             activity.Time = DateTime.UtcNow;
+
+            Console.WriteLine($"Saving activity for user {existingUser.UserName}: {activity.Name}, {activity.CaloriesBurnedPerMinute} calories/min, {activity.Duration} minutes");
 
             _context.PhysicalActivities.Add(activity);
             await _context.SaveChangesAsync();
@@ -37,13 +40,16 @@ namespace NutriTrack.Services
         }
 
 
-        public async Task<IQueryable<PhysicalActivity>> GetPhysicalActivityHistoryAsync(string userId)
-        {
-            var activities = _context.PhysicalActivities
-                .Where(pa => pa.UserId == userId)
-                .OrderByDescending(pa => pa.Time);
 
-            return await Task.FromResult(activities);
+        public async Task<List<PhysicalActivity>> GetPhysicalActivityHistoryAsync(string userId)
+        {
+            var activities = await _context.PhysicalActivities
+                .Where(pa => pa.UserId == userId)
+                .OrderByDescending(pa => pa.Time)
+                .ToListAsync();
+
+            return activities;
         }
+
     }
 }

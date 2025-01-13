@@ -2,20 +2,19 @@
 
 #nullable disable
 
-namespace NutriTrack.Data.Migrations
+namespace NutriTrackData.Migrations
 {
     /// <inheritdoc />
-    public partial class OnModelCratingUpdate : Migration
+    public partial class PADataTypeChange : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<double>(
-                name: "TotalCaloriesBurned",
+            migrationBuilder.AlterColumn<int>(
+                name: "Duration",
                 table: "PhysicalActivities",
-                type: "float",
+                type: "int",
                 nullable: false,
-                defaultValue: 0.0,
                 oldClrType: typeof(double),
                 oldType: "float");
         }
@@ -24,13 +23,12 @@ namespace NutriTrack.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<double>(
-                name: "TotalCaloriesBurned",
+                name: "Duration",
                 table: "PhysicalActivities",
                 type: "float",
                 nullable: false,
-                oldClrType: typeof(double),
-                oldType: "float",
-                oldDefaultValue: 0.0);
+                oldClrType: typeof(int),
+                oldType: "int");
         }
     }
 }

@@ -4,6 +4,7 @@ using NutriTrack.Data;
 using NutriTrack.Services;
 using NutriTrackApp.Interfaces;
 using NutriTrackData.Entities;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,10 @@ builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfi
     .AddDefaultTokenProviders();
 
 builder.Services.AddControllersWithViews();
+
+var cultureInfo = new CultureInfo("en-US");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 var app = builder.Build();
 

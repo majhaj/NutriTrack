@@ -7,6 +7,6 @@ namespace NutriTrackApp.Interfaces
     public interface IPhysicalActivityService
     {
         Task<bool> SavePhysicalActivityAsync(User currentUser, PhysicalActivity activity);
-        Task<IQueryable<PhysicalActivity>> GetPhysicalActivityHistoryAsync(string userId);
+        Task<List<PhysicalActivity>> GetPhysicalActivityHistoryAsync(string userId);
     }
 }

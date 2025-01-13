@@ -39,8 +39,15 @@ namespace NutriTrack.Services
             {
                 throw new KeyNotFoundException($"Product with id {product.Id} not found");
             }
-                _context.Update(product);
+
+            existingProduct.Name = product.Name;
+            existingProduct.Calories = product.Calories;
+            existingProduct.Protein = product.Protein;
+            existingProduct.Carbs = product.Carbs;
+            existingProduct.Fat = product.Fat;
+
             await _context.SaveChangesAsync();
         }
+
     }
 }
