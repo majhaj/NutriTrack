@@ -1,0 +1,22 @@
+﻿INSERT INTO Products (Name, Calories, Protein, Carbs, Fat)
+VALUES 
+('Apple', 52, 0.3, 14, 0.2),
+('Banana', 96, 1.3, 27, 0.3),
+('Chicken Breast', 165, 31, 0, 3.6),
+('Egg', 155, 13, 1.1, 11),
+('Almonds', 579, 21, 22, 50),
+('Rice (White, Cooked)', 130, 2.7, 28, 0.3),
+('Salmon', 208, 20, 0, 13),
+('Broccoli', 55, 3.7, 11, 0.6),
+('Avocado', 160, 2, 9, 15),
+('Cheese (Cheddar)', 402, 25, 1.3, 33),
+('Oatmeal', 68, 2.4, 12, 1.4),
+('Milk (Whole)', 61, 3.2, 4.8, 3.3),
+('Butter', 717, 0.9, 0.1, 81),
+('Sweet Potato', 86, 1.6, 20, 0.1),
+('Peanut Butter', 589, 25, 20, 50),
+('Yogurt (Plain)', 59, 10, 3.6, 0.4),
+('Tofu', 76, 8, 1.9, 4.8),
+('Orange', 43, 0.9, 9, 0.1),
+('Beef (Lean)', 250, 26, 0, 17),
+('Spinach', 23, 2.9, 3.6, 0.4);

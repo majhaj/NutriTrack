@@ -6,6 +6,25 @@
 
 <h2>Product List</h2>
 
+<form asp-action="Index" method="get">
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <input type="text" name="name" class="form-control" placeholder="Search by name" />
+        </div>
+        <div class="col-md-3">
+            <input type="number" name="minCalories" class="form-control" placeholder="Min Calories" step="0.01" />
+        </div>
+        <div class="col-md-3">
+            <input type="number" name="maxCalories" class="form-control" placeholder="Max Calories" step="0.01" />
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+    <a href="@Url.Action("Index", "Product")" class="btn btn-secondary">Reset Filters</a>
+</form>
+
+
 <table class="table">
     <thead>
         <tr>
@@ -35,4 +54,3 @@
 </table>
 
 <a href="@Url.Action("Create", "Product")" class="btn btn-success">Add New Product</a>
-

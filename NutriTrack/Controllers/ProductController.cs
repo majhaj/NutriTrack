@@ -14,11 +14,29 @@ public class ProductController : Controller
         _productService = productService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? name, double? minCalories, double? maxCalories)
     {
         var products = await _productService.GetAllProductsAsync();
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            products = products.Where(p => p.Name.Contains(name, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        if (minCalories.HasValue)
+        {
+            products = products.Where(p => p.Calories >= minCalories.Value).ToList();
+        }
+
+        if (maxCalories.HasValue)
+        {
+            products = products.Where(p => p.Calories <= maxCalories.Value).ToList();
+        }
+
         return View(products);
     }
+
+
 
     public async Task<IActionResult> Edit(int? id)
     {
