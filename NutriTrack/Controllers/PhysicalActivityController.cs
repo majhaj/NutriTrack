@@ -18,7 +18,7 @@ public class PhysicalActivityController : Controller
         _userManager = userManager;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string activityName, int? minDuration, int? maxDuration)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
@@ -27,6 +27,20 @@ public class PhysicalActivityController : Controller
         }
 
         var activities = await _activityService.GetPhysicalActivityHistoryAsync(user.Id);
+
+        if (!string.IsNullOrEmpty(activityName))
+        {
+            activities = activities.Where(a => a.Name.Contains(activityName, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        if (minDuration.HasValue)
+        {
+            activities = activities.Where(a => a.Duration >= minDuration.Value).ToList();
+        }
+        if (maxDuration.HasValue)
+        {
+            activities = activities.Where(a => a.Duration <= maxDuration.Value).ToList();
+        }
+
         return View(activities);
     }
 

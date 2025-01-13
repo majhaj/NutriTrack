@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using NutriTrackData.Models;
 
 public class PhysicalActivityServiceTests
 {
@@ -14,7 +15,6 @@ public class PhysicalActivityServiceTests
 
     public PhysicalActivityServiceTests()
     {
-        // Użycie in-memory database dla testów
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase("TestDb_PhysicalActivities")
             .Options;
@@ -23,7 +23,6 @@ public class PhysicalActivityServiceTests
         _service = new PhysicalActivityService(_context);
     }
 
-    // Upewnij się, że baza danych jest czyszczona przed każdym testem
     private void ClearDatabase()
     {
         _context.Users.RemoveRange(_context.Users);
@@ -31,93 +30,102 @@ public class PhysicalActivityServiceTests
         _context.SaveChanges();
     }
 
-    /*[Fact]
-    public async Task SavePhysicalActivityAsync_SavesActivity_WhenUserExists()
-    {
-        // Arrange
-        ClearDatabase();  // Czyszczenie bazy przed testem
-        var user = new User { Id = "user1", Name = "Test User" };
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
-        var activity = new PhysicalActivity { Name = "Running", Duration = 30 };
-
-        // Act
-        var result = await _service.SavePhysicalActivityAsync(user, activity);
-
-        // Assert
-        Assert.True(result);
-        Assert.Single(_context.PhysicalActivities);
-        Assert.Equal("Running", _context.PhysicalActivities.First().Name);
-    }*/
-
-/*    [Fact]
-    public async Task SavePhysicalActivityAsync_ThrowsException_WhenUserDoesNotExist()
-    {
-        // Arrange
-        ClearDatabase();  // Czyszczenie bazy przed testem
-        var nonExistentUser = new User { Id = "nonexistent", Name = "Nonexistent User" };
-        var activity = new PhysicalActivity { Name = "Running", Duration = 30 };
-
-        // Act & Assert
-        await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
-        {
-            await _service.SavePhysicalActivityAsync(nonExistentUser, activity);
-        });
-    }*/
-
-    /*[Fact]
-    public async Task GetPhysicalActivityHistoryAsync_ReturnsActivities_WhenUserHasActivities()
-    {
-        // Arrange
-        ClearDatabase();  // Czyszczenie bazy przed testem
-        var user = new User { Id = "user1", Name = "Test User" };
-        _context.Users.Add(user);
-
-        var activities = new List<PhysicalActivity>
-        {
-            new PhysicalActivity { Name = "Running", Duration = 30, UserId = "user1", Time = DateTime.UtcNow.AddMinutes(-10) },
-            new PhysicalActivity { Name = "Swimming", Duration = 45, UserId = "user1", Time = DateTime.UtcNow }
-        };
-
-        _context.PhysicalActivities.AddRange(activities);
-        await _context.SaveChangesAsync();
-
-        // Act
-        var result = await _service.GetPhysicalActivityHistoryAsync(user.Id);
-
-        // Assert
-        Assert.Equal(2, result.Count());
-        Assert.Equal("Swimming", result.First().Name); // Oczekiwane posortowanie malejąco
-    }*/
-
     [Fact]
     public async Task GetPhysicalActivityHistoryAsync_ReturnsEmpty_WhenUserHasNoActivities()
     {
-        // Arrange
-        ClearDatabase();  // Czyszczenie bazy przed testem
+        ClearDatabase();
         var user = new User { Id = "user1", Name = "Test User" };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        // Act
         var result = await _service.GetPhysicalActivityHistoryAsync(user.Id);
 
-        // Assert
         Assert.Empty(result);
     }
 
     [Fact]
     public async Task GetPhysicalActivityHistoryAsync_ReturnsEmpty_WhenUserDoesNotExist()
     {
-        // Arrange
-        ClearDatabase();  // Czyszczenie bazy przed testem
+        ClearDatabase();
         var nonExistentUserId = "nonexistent";
 
-        // Act
         var result = await _service.GetPhysicalActivityHistoryAsync(nonExistentUserId);
 
-        // Assert
         Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task SavePhysicalActivityAsync_ThrowsException_WhenUserDoesNotExist()
+    {
+        ClearDatabase();
+        var nonExistentUserName = "nonexistentUser";
+        var model = new PhysicalActivityModel
+        {
+            Name = "Running",
+            Duration = 30,
+            CaloriesBurnedPerMinute = 10
+        };
+
+        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
+        {
+            await _service.SavePhysicalActivityAsync(nonExistentUserName, model);
+        });
+
+        Assert.Equal($"User with username {nonExistentUserName} not found", exception.Message);
+    }
+
+    [Fact]
+    public async Task GetPhysicalActivityHistoryAsync_ReturnsActivities_WhenUserHasActivities()
+    {
+        ClearDatabase();
+        var user = new User { UserName = "user1", Name = "Test User" };
+        _context.Users.Add(user);
+
+        var activities = new List<PhysicalActivity>
+    {
+        new PhysicalActivity { Name = "Running", Duration = 30, UserName = "user1", Time = DateTime.UtcNow.AddMinutes(-10) },
+        new PhysicalActivity { Name = "Swimming", Duration = 45, UserName = "user1", Time = DateTime.UtcNow }
+    };
+
+        _context.PhysicalActivities.AddRange(activities);
+        await _context.SaveChangesAsync();
+
+        var result = await _service.GetPhysicalActivityHistoryAsync(user.UserName);
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("Swimming", result.First().Name);
+        Assert.Equal(user.UserName, result.First().UserName);
+    }
+
+    [Fact]
+    public async Task DeletePhysicalActivityAsync_DeletesActivity_WhenActivityExists()
+    {
+        ClearDatabase();
+        var user = new User { UserName = "user1", Name = "Test User" };
+        _context.Users.Add(user);
+
+        var activity = new PhysicalActivity
+        {
+            Name = "Running",
+            Duration = 30,
+            UserName = user.UserName,
+            User = user,
+            Time = DateTime.UtcNow.AddMinutes(-10)
+        };
+
+        _context.PhysicalActivities.Add(activity);
+        await _context.SaveChangesAsync();
+
+        var existingActivity = await _context.PhysicalActivities.FirstOrDefaultAsync(a => a.Id == activity.Id);
+        Assert.NotNull(existingActivity);
+
+        var result = await _service.DeletePhysicalActivityAsync(activity.Id);
+
+        Assert.True(result);
+        var deletedActivity = await _context.PhysicalActivities.FindAsync(activity.Id);
+        Assert.Null(deletedActivity);
+
+        var activityAfterDeletion = await _context.PhysicalActivities.FindAsync(activity.Id);
+        Assert.Null(activityAfterDeletion);
     }
 }
