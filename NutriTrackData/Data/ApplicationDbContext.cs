@@ -36,7 +36,7 @@ namespace NutriTrack.Data
             builder.Entity<User>()
                 .HasMany(p => p.PhysicalActivities)
                 .WithOne(pa => pa.User)
-                .HasForeignKey(pa => pa.UserId);
+                .HasForeignKey(pa => pa.UserName);
 
             builder.Entity<Meal>()
                 .HasOne(m => m.Category)

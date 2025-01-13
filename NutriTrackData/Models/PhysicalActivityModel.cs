@@ -1,13 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace NutriTrackData.Entities
+namespace NutriTrackData.Models
 {
-    public class PhysicalActivity
+    public class PhysicalActivityModel
     {
-        [Key]
-        public int Id { get; set; }
-
         [Required(ErrorMessage = "Name is required")]
         [StringLength(100, ErrorMessage = "Name is too long")]
         public string Name { get; set; }
@@ -17,9 +18,5 @@ namespace NutriTrackData.Entities
 
         [Required(ErrorMessage = "Duration is required")]
         public int Duration { get; set; }
-        public DateTime Time { get; set; } = DateTime.UtcNow;
-
-        public string UserName { get; set; }
-        public User User { get; set; }
     }
 }

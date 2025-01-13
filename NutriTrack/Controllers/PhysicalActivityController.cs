@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using NutriTrack.Services;
 using NutriTrackApp.Interfaces;
 using NutriTrackData.Entities;
+using NutriTrackData.Models;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 [Authorize]
 public class PhysicalActivityController : Controller
@@ -37,52 +36,84 @@ public class PhysicalActivityController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([Bind("Name,CaloriesBurnedPerMinute,Duration")] PhysicalActivity activityModel)
+    public async Task<IActionResult> Create(PhysicalActivityModel model)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            // Sprawdzenie, czy użytkownik jest zalogowany
-            if (!User.Identity.IsAuthenticated)
-            {
-                // Zwrócenie błędu, jeśli użytkownik nie jest zalogowany
-                return Unauthorized("User is not logged in.");
-            }
-
-            // Pobranie userId z Claims
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // Sprawdzenie, czy userId jest poprawnie pobrane
-            if (string.IsNullOrEmpty(userId))
-            {
-                // Logowanie błędu, jeśli userId jest puste
-                Console.WriteLine("UserId is null or empty.");
-                return Unauthorized("Unable to retrieve user ID.");
-            }
-
-            // Logowanie userId dla debugowania
-            Console.WriteLine($"User ID: {userId}");
-
-            // Sprawdzenie, czy użytkownik istnieje w bazie danych
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                // Jeśli użytkownik nie istnieje, przekierowanie na stronę logowania
-                return RedirectToAction("Login", "Account");
-            }
-
-            // Zapis aktywności fizycznej
-            var result = await _activityService.SavePhysicalActivityAsync(user, activityModel);
-
-            if (result)
-            {
-                return RedirectToAction("Index");
-            }
-            else
-            {
-                ModelState.AddModelError("", "Error saving data.");
-            }
+            return View(model);
         }
 
-        return View(activityModel);
+        var userName = User.Identity.Name;
+
+        if (string.IsNullOrEmpty(userName))
+        {
+            return Unauthorized("Unable to retrieve user name.");
+        }
+
+        var result = await _activityService.SavePhysicalActivityAsync(userName, model);
+
+        if (result)
+        {
+            return RedirectToAction("Index");
+        }
+        else
+        {
+            ModelState.AddModelError("", "Error saving data.");
+        }
+
+        return View(model);
     }
+
+    public async Task<IActionResult> Edit(int id)
+    {
+        var activity = await _activityService.GetPhysicalActivityByIdAsync(id);
+        if (activity == null)
+        {
+            return NotFound();
+        }
+
+        var model = new PhysicalActivityModel
+        {
+            Name = activity.Name,
+            CaloriesBurnedPerMinute = activity.CaloriesBurnedPerMinute,
+            Duration = activity.Duration
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Edit(int id, PhysicalActivityModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var result = await _activityService.UpdatePhysicalActivityAsync(id, model);
+
+        if (result)
+        {
+            return RedirectToAction("Index");
+        }
+        else
+        {
+            ModelState.AddModelError("", "Error updating data.");
+        }
+
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var result = await _activityService.DeletePhysicalActivityAsync(id);
+        if (!result)
+        {
+            ModelState.AddModelError("", "Error deleting activity.");
+        }
+
+        return RedirectToAction("Index");
+    }
+
 }

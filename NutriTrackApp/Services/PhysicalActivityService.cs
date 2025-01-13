@@ -1,10 +1,11 @@
 ﻿using NutriTrackData.Entities;
 using NutriTrack.Data;
 using Microsoft.EntityFrameworkCore;
+using NutriTrackApp.Interfaces;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using NutriTrackApp.Interfaces;
+using NutriTrackData.Models;
 
 namespace NutriTrack.Services
 {
@@ -17,21 +18,25 @@ namespace NutriTrack.Services
             _context = context;
         }
 
-        public async Task<bool> SavePhysicalActivityAsync(User currentUser, PhysicalActivity activity)
+        public async Task<bool> SavePhysicalActivityAsync(string userName, PhysicalActivityModel model)
         {
-            var existingUser = await _context.Users
-                .FirstOrDefaultAsync(u => u.Id == currentUser.Id);
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName == userName);
 
-            if (existingUser == null)
+            if (user == null)
             {
-                throw new KeyNotFoundException($"User with id {currentUser.Id} not found");
+                throw new KeyNotFoundException($"User with username {userName} not found");
             }
 
-            activity.UserId = existingUser.Id;
-            activity.User = existingUser;
-            activity.Time = DateTime.UtcNow;
-
-            Console.WriteLine($"Saving activity for user {existingUser.UserName}: {activity.Name}, {activity.CaloriesBurnedPerMinute} calories/min, {activity.Duration} minutes");
+            var activity = new PhysicalActivity
+            {
+                Name = model.Name,
+                CaloriesBurnedPerMinute = model.CaloriesBurnedPerMinute,
+                Duration = model.Duration,
+                UserName = userName,
+                User = user,
+                Time = DateTime.UtcNow
+            };
 
             _context.PhysicalActivities.Add(activity);
             await _context.SaveChangesAsync();
@@ -39,17 +44,49 @@ namespace NutriTrack.Services
             return true;
         }
 
-
-
-        public async Task<List<PhysicalActivity>> GetPhysicalActivityHistoryAsync(string userId)
+        public async Task<List<PhysicalActivity>> GetPhysicalActivityHistoryAsync(string userName)
         {
             var activities = await _context.PhysicalActivities
-                .Where(pa => pa.UserId == userId)
+                .Where(pa => pa.UserName == userName)
                 .OrderByDescending(pa => pa.Time)
                 .ToListAsync();
 
             return activities;
         }
 
+        public async Task<PhysicalActivity> GetPhysicalActivityByIdAsync(int id)
+        {
+            return await _context.PhysicalActivities
+                .FirstOrDefaultAsync(pa => pa.Id == id);
+        }
+
+        public async Task<bool> UpdatePhysicalActivityAsync(int id, PhysicalActivityModel model)
+        {
+            var activity = await _context.PhysicalActivities.FirstOrDefaultAsync(pa => pa.Id == id);
+            if (activity == null)
+            {
+                return false;
+            }
+
+            activity.Name = model.Name;
+            activity.CaloriesBurnedPerMinute = model.CaloriesBurnedPerMinute;
+            activity.Duration = model.Duration;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeletePhysicalActivityAsync(int id)
+        {
+            var activity = await _context.PhysicalActivities.FirstOrDefaultAsync(pa => pa.Id == id);
+            if (activity == null)
+            {
+                return false;
+            }
+
+            _context.PhysicalActivities.Remove(activity);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }
