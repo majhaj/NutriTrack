@@ -1,28 +1,52 @@
 ﻿@model NutriTrackData.Entities.User
 
-<h1>Welcome to your profile, @Model.Name</h1>
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-5 text-primary">
+            Welcome to your profile, <span class="fw-bold">@Model.Name</span>
+        </h1>
+        <p class="text-muted">Here is your personal profile information.</p>
+    </div>
 
-<div>
-    <h3>Your profile information</h3>
-    <table class="table">
-        <tr>
-            <th>Name</th>
-            <td>@Model.Name</td>
-        </tr>
-        <tr>
-            <th>Date of Birth</th>
-            <td>@Model.DateOfBirth.ToString("yyyy-MM-dd")</td>
-        </tr>
-        <tr>
-            <th>Weight</th>
-            <td>@Model.Weight kg</td>
-        </tr>
-        <tr>
-            <th>Height</th>
-            <td>@Model.Height cm</td>
-        </tr>
-    </table>
-
-    <a href="@Url.Action("Edit", "UserProfile")" class="btn btn-primary">Edit Profile</a>
-    <a href="@Url.Action("History", "UserProfile")" class="btn btn-secondary">Check Weight History</a>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3>Your Profile Information</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <th scope="row" class="text-end">Name:</th>
+                                <td>@Model.Name</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="text-end">Date of Birth:</th>
+                                <td>@Model.DateOfBirth.ToString("yyyy-MM-dd")</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="text-end">Weight:</th>
+                                <td>@Model.Weight kg</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="text-end">Height:</th>
+                                <td>@Model.Height cm</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="@Url.Action("Edit", "UserProfile")" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </a>
+                    <a href="@Url.Action("History", "UserProfile")" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-history"></i> Check Weight History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">

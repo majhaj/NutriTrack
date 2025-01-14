@@ -4,53 +4,80 @@
     ViewData["Title"] = "Product List";
 }
 
-<h2>Product List</h2>
-
-<form asp-action="Index" method="get">
-    <div class="row mb-3">
-        <div class="col-md-3">
-            <input type="text" name="name" class="form-control" placeholder="Search by name" />
+<div class="container py-5">
+    <div class="row justify-content-between align-items-center mb-4">
+        <div class="col-md-6">
+            <h2 class="text-success">@ViewData["Title"]</h2>
         </div>
-        <div class="col-md-3">
-            <input type="number" name="minCalories" class="form-control" placeholder="Min Calories" step="0.01" />
-        </div>
-        <div class="col-md-3">
-            <input type="number" name="maxCalories" class="form-control" placeholder="Max Calories" step="0.01" />
-        </div>
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-primary">Filter</button>
+        <div class="col-md-6 text-end">
+            <a href="@Url.Action("Create", "Product")" class="btn btn-success">
+                <i class="fas fa-plus"></i> Add New Product
+            </a>
         </div>
     </div>
-    <a href="@Url.Action("Index", "Product")" class="btn btn-secondary">Reset Filters</a>
-</form>
 
+    <form asp-action="Index" method="get" class="mb-4">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <input type="text" name="name" class="form-control" placeholder="Search by name" />
+            </div>
+            <div class="col-md-3">
+                <input type="number" name="minCalories" class="form-control" placeholder="Min Calories" step="0.01" />
+            </div>
+            <div class="col-md-3">
+                <input type="number" name="maxCalories" class="form-control" placeholder="Max Calories" step="0.01" />
+            </div>
+            <div class="col-md-3 d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                <a href="@Url.Action("Index", "Product")" class="btn btn-secondary ms-2">
+                    <i class="fas fa-redo"></i> Reset Filters
+                </a>
+            </div>
+        </div>
+    </form>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Calories</th>
-            <th>Protein</th>
-            <th>Carbs</th>
-            <th>Fat</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var product in Model)
-        {
-            <tr>
-                <td>@product.Name</td>
-                <td>@product.Calories</td>
-                <td>@product.Protein</td>
-                <td>@product.Carbs</td>
-                <td>@product.Fat</td>
-                <td>
-                    <a href="@Url.Action("Edit", "Product", new { id = product.Id })" class="btn btn-primary">Edit</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Calories</th>
+                    <th>Protein</th>
+                    <th>Carbs</th>
+                    <th>Fat</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No products found.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var product in Model)
+                    {
+                        <tr>
+                            <td>@product.Name</td>
+                            <td>@product.Calories</td>
+                            <td>@product.Protein</td>
+                            <td>@product.Carbs</td>
+                            <td>@product.Fat</td>
+                            <td class="text-center">
+                                <a href="@Url.Action("Edit", "Product", new { id = product.Id })" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 
-<a href="@Url.Action("Create", "Product")" class="btn btn-success">Add New Product</a>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">

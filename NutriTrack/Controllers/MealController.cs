@@ -5,124 +5,129 @@ using NutriTrackData.Entities;
 using NutriTrackData.Models;
 using System.Security.Claims;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
 
-public class MealController : Controller
+namespace NutriTrack.Controllers
 {
-    private readonly IMealService _mealService;
-    private readonly ApplicationDbContext _context;
-
-    public MealController(IMealService mealService, ApplicationDbContext context)
+    [Authorize]
+    public class MealController : Controller
     {
-        _mealService = mealService;
-        _context = context;
-    }
+        private readonly IMealService _mealService;
+        private readonly ApplicationDbContext _context;
 
-    public async Task<IActionResult> Index()
-    {
-        var meals = await _context.Meals
-                                  .Include(m => m.Category)
-                                  .ToListAsync();
-
-        return View(meals);
-    }
-
-
-    public async Task<IActionResult> Create()
-    {
-        ViewBag.Categories = await _context.MealCategories.ToListAsync();
-        ViewBag.AvailableProducts = await _context.Products.ToListAsync();
-
-        return View(new MealModel());
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(MealModel model)
-    {
-        if (ModelState.IsValid)
+        public MealController(IMealService mealService, ApplicationDbContext context)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await _mealService.SaveMealAsync(userId, model);
-            return RedirectToAction(nameof(Index));
+            _mealService = mealService;
+            _context = context;
         }
 
-        ViewBag.Categories = await _context.MealCategories.ToListAsync();
-        ViewBag.AvailableProducts = await _context.Products.ToListAsync();
-
-        foreach (var key in ModelState.Keys)
+        public async Task<IActionResult> Index()
         {
-            var errors = ModelState[key].Errors;
-            foreach (var error in errors)
+            var meals = await _context.Meals
+                                      .Include(m => m.Category)
+                                      .ToListAsync();
+
+            return View(meals);
+        }
+
+
+        public async Task<IActionResult> Create()
+        {
+            ViewBag.Categories = await _context.MealCategories.ToListAsync();
+            ViewBag.AvailableProducts = await _context.Products.ToListAsync();
+
+            return View(new MealModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(MealModel model)
+        {
+            if (ModelState.IsValid)
             {
-                Console.WriteLine($"Error in '{key}': {error.ErrorMessage}");
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                await _mealService.SaveMealAsync(userId, model);
+                return RedirectToAction(nameof(Index));
             }
-        }
 
-        return View(model);
-    }
+            ViewBag.Categories = await _context.MealCategories.ToListAsync();
+            ViewBag.AvailableProducts = await _context.Products.ToListAsync();
 
-    public async Task<IActionResult> Delete(int id)
-    {
-        try
-        {
-            await _mealService.DeleteMealAsync(id);
-            TempData["SuccessMessage"] = "Meal deleted successfully.";
-        }
-        catch (Exception ex)
-        {
-            TempData["ErrorMessage"] = $"Error deleting meal: {ex.Message}";
-        }
-        return RedirectToAction(nameof(Index));
-    }
-
-    public async Task<IActionResult> Edit(int id)
-    {
-        var meal = await _mealService.GetMealByIdAsync(id);
-
-        if (meal == null)
-        {
-            return NotFound();
-        }
-
-        ViewBag.Categories = await _context.MealCategories.ToListAsync();
-        ViewBag.AvailableProducts = await _context.Products.ToListAsync();
-
-        var model = new MealModel
-        {
-            Name = meal.Name,
-            CategoryId = meal.CategoryId,
-            Products = meal.MealProducts.Select(mp => new ProductQuantityModel
+            foreach (var key in ModelState.Keys)
             {
-                ProductId = mp.ProductId,
-                Quantity = mp.Quantity
-            }).ToList()
-        };
+                var errors = ModelState[key].Errors;
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"Error in '{key}': {error.ErrorMessage}");
+                }
+            }
 
-        var settings = new JsonSerializerSettings
+            return View(model);
+        }
+
+        public async Task<IActionResult> Delete(int id)
         {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        };
-
-        ViewBag.AvailableProductsJson = JsonConvert.SerializeObject(ViewBag.AvailableProducts, settings);
-
-        return View(model);
-    }
-
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, MealModel model)
-    {
-        if (ModelState.IsValid)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await _mealService.UpdateMealAsync(id, model);
+            try
+            {
+                await _mealService.DeleteMealAsync(id);
+                TempData["SuccessMessage"] = "Meal deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error deleting meal: {ex.Message}";
+            }
             return RedirectToAction(nameof(Index));
         }
 
-        ViewBag.Categories = await _context.MealCategories.ToListAsync();
-        ViewBag.AvailableProducts = await _context.Products.ToListAsync();
+        public async Task<IActionResult> Edit(int id)
+        {
+            var meal = await _mealService.GetMealByIdAsync(id);
 
-        return View(model);
+            if (meal == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Categories = await _context.MealCategories.ToListAsync();
+            ViewBag.AvailableProducts = await _context.Products.ToListAsync();
+
+            var model = new MealModel
+            {
+                Name = meal.Name,
+                CategoryId = meal.CategoryId,
+                Products = meal.MealProducts.Select(mp => new ProductQuantityModel
+                {
+                    ProductId = mp.ProductId,
+                    Quantity = mp.Quantity
+                }).ToList()
+            };
+
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
+
+            ViewBag.AvailableProductsJson = JsonConvert.SerializeObject(ViewBag.AvailableProducts, settings);
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, MealModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                await _mealService.UpdateMealAsync(id, model);
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewBag.Categories = await _context.MealCategories.ToListAsync();
+            ViewBag.AvailableProducts = await _context.Products.ToListAsync();
+
+            return View(model);
+        }
     }
 }

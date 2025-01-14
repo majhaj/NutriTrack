@@ -1,27 +1,64 @@
 ﻿@model NutriTrackData.Models.PhysicalActivityModel
 
-<h2>Add Your Physical Activity</h2>
+<div class="container py-5">
+    <h2 class="text-primary">Add Your Activity</h2>
+    <p class="text-muted">Log your new activity by filling out the form below.</p>
 
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="Name" class="control-label">Activity Name</label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
+    <form id="activityForm" asp-action="Create" method="post" class="mt-4 shadow p-4 bg-light rounded">
+        <div class="form-group mb-3">
+            <label asp-for="Name" class="form-label fw-bold">Activity Name</label>
+            <input asp-for="Name" id="name" class="form-control" placeholder="Enter activity name" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label asp-for="CaloriesBurnedPerMinute" class="control-label">Calories Burned Per Minute</label>
-        <input asp-for="CaloriesBurnedPerMinute" type="number" class="form-control" />
-        <span asp-validation-for="CaloriesBurnedPerMinute" class="text-danger"></span>
-    </div>
+        <div class="form-group mb-3">
+            <label asp-for="CaloriesBurnedPerMinute" class="form-label fw-bold">Calories Burned Per Minute</label>
+            <input asp-for="CaloriesBurnedPerMinute" id="calories" type="number" class="form-control" placeholder="Enter calories burned per minute" />
+            <span asp-validation-for="CaloriesBurnedPerMinute" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label asp-for="Duration" class="control-label">Duration (minutes)</label>
-        <input asp-for="Duration" type="number" class="form-control" />
-        <span asp-validation-for="Duration" class="text-danger"></span>
-    </div>
-     
-    <button type="submit" class="btn btn-primary">Add Activity</button>
-</form>
+        <div class="form-group mb-3">
+            <label asp-for="Duration" class="form-label fw-bold">Duration (minutes)</label>
+            <input asp-for="Duration" id="duration" type="number" class="form-control" placeholder="Enter duration in minutes" />
+            <span asp-validation-for="Duration" class="text-danger"></span>
+        </div>
 
-<a href="@Url.Action("Index")" class="btn btn-secondary mt-2">Back to Your Activity</a>
+        <div class="mt-4 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="fas fa-save"></i> Add Activity
+            </button>
+            <a href="@Url.Action("Index")" class="btn btn-secondary px-4">
+                <i class="fas fa-arrow-left"></i> Back to Activities
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById("activityForm").addEventListener("submit", function (event) {
+        let isValid = true;
+
+        const name = document.getElementById("name").value.trim();
+        const calories = parseFloat(document.getElementById("calories").value);
+        const duration = parseFloat(document.getElementById("duration").value);
+
+        if (name === "") {
+            alert("Activity Name is required.");
+            isValid = false;
+        }
+
+        if (isNaN(calories) || calories <= 0) {
+            alert("Calories Burned Per Minute must be a positive number.");
+            isValid = false;
+        }
+
+        if (isNaN(duration) || duration <= 0) {
+            alert("Duration must be a positive number.");
+            isValid = false;
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+</script>
