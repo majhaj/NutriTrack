@@ -1,0 +1,44 @@
+﻿@model List<NutriTrackData.Entities.Meal>
+
+@{
+    ViewData["Title"] = "Meals";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<a href="@Url.Action("Create", "Meal")" class="btn btn-success mb-3">Add New Meal</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Calories</th>
+            <th>Time</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var meal in Model)
+        {
+            <tr>
+                <td>@meal.Name</td>
+                <td>@meal.Category.Name</td>
+                <td>@meal.Calories</td>
+                <td>@meal.Time</td>
+                <td>
+                    <a href="@Url.Action("Edit", "Meal", new { id = meal.Id })" class="btn btn-primary btn-sm">Edit</a>
+                    <button class="btn btn-danger btn-sm" onclick="confirmDeletion('@Url.Action("Delete", "Meal", new { id = meal.Id })')">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    function confirmDeletion(deleteUrl) {
+        if (confirm("Are you sure you want to delete this meal?")) {
+            window.location.href = deleteUrl;
+        }
+    }
+</script>

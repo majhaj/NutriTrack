@@ -12,8 +12,7 @@ namespace NutriTrackData.Entities
         [StringLength(100)]
         public string Name { get; set; }
 
-        [Required]
-        public int Calories { get; set; }
+        public int Calories { get; set; } = 0;
 
         public DateTime Time { get; set; } = DateTime.UtcNow;
 

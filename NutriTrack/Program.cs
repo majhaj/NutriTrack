@@ -13,6 +13,7 @@ builder.Services.AddScoped<UserManager<User>>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IPhysicalActivityService, PhysicalActivityService>();
+builder.Services.AddScoped<IMealService, MealService>();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
