@@ -6,52 +6,49 @@
     var availableProducts = ViewBag.AvailableProducts as List<NutriTrackData.Entities.Product>;
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="container py-5">
+    <h2 class="text-primary">@ViewData["Title"]</h2>
+    <p class="text-muted">Create a new meal by filling out the form below.</p>
 
-<form method="post">
-    <div class="form-group">
-        <label for="Name">Meal Name</label>
-        <input type="text" class="form-control" id="Name" name="Name" value="@Model.Name" required />
-    </div>
-
-    <div class="form-group">
-        <label for="CategoryId">Category</label>
-        <select class="form-control" id="CategoryId" name="CategoryId" required>
-            @if (categories != null)
-            {
-                foreach (var category in categories)
-                {
-                    <option value="@category.CategoryId" selected="@(Model.CategoryId == category.CategoryId)">@category.Name</option>
-                }
-            }
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label for="Products">Products</label>
-        <div id="product-container">
-            @for (int i = 0; i < Model.Products.Count; i++)
-            {
-                <div class="product-row">
-                    <select class="form-control" name="Products[@i].ProductId" required>
-                        <option value="">Select Product</option>
-                        @if (availableProducts != null)
-                        {
-                            foreach (var product in availableProducts)
-                            {
-                                <option value="@product.Id" selected="@(Model.Products[i].ProductId == product.Id)">@product.Name</option>
-                            }
-                        }
-                    </select>
-                    <input type="number" class="form-control" name="Products[@i].Quantity" placeholder="Quantity (grams)" value="@Model.Products[i].Quantity" required />
-                </div>
-            }
+    <form method="post" class="mt-4 shadow p-4 bg-light rounded">
+        <div class="form-group mb-3">
+            <label for="Name" class="form-label fw-bold">Meal Name</label>
+            <input type="text" class="form-control" id="Name" name="Name" placeholder="Enter meal name" required />
         </div>
-        <button type="button" class="btn btn-info" id="add-product-row">Add Product</button>
-    </div>
 
-    <button type="submit" class="btn btn-primary">Save Meal</button>
-</form>
+        <div class="form-group mb-3">
+            <label for="CategoryId" class="form-label fw-bold">Category</label>
+            <select class="form-select" id="CategoryId" name="CategoryId" required>
+                <option value="" disabled selected>-- Select Category --</option>
+                @if (categories != null)
+                {
+                    foreach (var category in categories)
+                    {
+                        <option value="@category.CategoryId">@category.Name</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Products" class="form-label fw-bold">Products</label>
+            <div id="product-container" class="border p-3 rounded bg-white">
+            </div>
+            <button type="button" class="btn btn-info mt-2" id="add-product-row">
+                <i class="fas fa-plus"></i> Add Product
+            </button>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="fas fa-save"></i> Create Meal
+            </button>
+            <a href="@Url.Action("Index", "Meal")" class="btn btn-secondary px-4">
+                <i class="fas fa-arrow-left"></i> Back to list
+            </a>
+        </div>
+    </form>
+</div>
 
 <script>
     var availableProducts = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.AvailableProducts));
@@ -59,10 +56,10 @@
     document.getElementById("add-product-row").addEventListener("click", function () {
         var productContainer = document.getElementById("product-container");
         var newProductRow = document.createElement("div");
-        newProductRow.classList.add("product-row");
+        newProductRow.classList.add("product-row", "mb-3", "d-flex", "gap-2");
 
         var productSelect = document.createElement("select");
-        productSelect.classList.add("form-control");
+        productSelect.classList.add("form-select");
         productSelect.name = "Products[" + productContainer.children.length + "].ProductId";
         var placeholderOption = document.createElement("option");
         placeholderOption.value = "";
