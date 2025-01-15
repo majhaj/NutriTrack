@@ -23,7 +23,11 @@ namespace NutriTrack.Controllers
 
         public async Task<IActionResult> Index(string? name, int? FilterCategory, int? calories)
         {
-            var query = _context.Meals.Include(m => m.Category).AsQueryable();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var query = _context.Meals
+                                .Include(m => m.Category)
+                                .Where(m => m.UserId == userId) // Filtrowanie według użytkownika
+                                .AsQueryable();
 
             if (!string.IsNullOrEmpty(name))
             {
@@ -39,9 +43,6 @@ namespace NutriTrack.Controllers
             {
                 query = query.Where(m => m.Calories <= calories.Value);
             }
-
-            //var sqlQuery = query.ToQueryString();
-            //Console.WriteLine($"Generated SQL Query: {sqlQuery}");
 
             var meals = await query.ToListAsync();
 
