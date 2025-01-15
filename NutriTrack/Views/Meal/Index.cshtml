@@ -4,36 +4,70 @@
     ViewData["Title"] = "Meals";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="container py-4">
+    <h2 class="text-primary">@ViewData["Title"]</h2>
 
-<a href="@Url.Action("Create", "Meal")" class="btn btn-success mb-3">Add New Meal</a>
+    <form asp-action="Index" method="get" class="row gy-3">
+        <div class="col-md-4">
+            <input type="text" name="name" class="form-control" placeholder="Search by Name" value="@ViewData["FilterName"]" />
+        </div>
+        <div class="col-md-4">
+            <select name="FilterCategory" class="form-control">
+                <option value="">-- Select Category --</option>
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <option value="@category.CategoryId" selected="@(ViewData["FilterCategory"]?.ToString() == category.CategoryId.ToString() ? "selected" : null)">
+                        @category.Name
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <input type="number" name="calories" class="form-control" placeholder="Max Calories" value="@ViewData["FilterCalories"]" />
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="@Url.Action("Index", "Meal")" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Calories</th>
-            <th>Time</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var meal in Model)
-        {
+    <a href="@Url.Action("Create", "Meal")" class="btn btn-success mt-3">Add New Meal</a>
+
+    <!-- Tabela -->
+    <table class="table mt-4">
+        <thead>
             <tr>
-                <td>@meal.Name</td>
-                <td>@meal.Category.Name</td>
-                <td>@meal.Calories</td>
-                <td>@meal.Time</td>
-                <td>
-                    <a href="@Url.Action("Edit", "Meal", new { id = meal.Id })" class="btn btn-primary btn-sm">Edit</a>
-                    <button class="btn btn-danger btn-sm" onclick="confirmDeletion('@Url.Action("Delete", "Meal", new { id = meal.Id })')">Delete</button>
-                </td>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Calories</th>
+                <th>Time</th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @if (Model == null || !Model.Any())
+            {
+                <tr>
+                    <td colspan="5" class="text-center">No meals found.</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var meal in Model)
+                {
+                    <tr>
+                        <td>@meal.Name</td>
+                        <td>@meal.Category.Name</td>
+                        <td>@meal.Calories</td>
+                        <td>@meal.Time.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>
+                            <a href="@Url.Action("Edit", "Meal", new { id = meal.Id })" class="btn btn-primary btn-sm">Edit</a>
+                            <button class="btn btn-danger btn-sm" onclick="confirmDeletion('@Url.Action("Delete", "Meal", new { id = meal.Id })')">Delete</button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
 
 <script>
     function confirmDeletion(deleteUrl) {

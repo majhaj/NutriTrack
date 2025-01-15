@@ -21,15 +21,38 @@ namespace NutriTrack.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? name, int? FilterCategory, int? calories)
         {
-            var meals = await _context.Meals
-                                      .Include(m => m.Category)
-                                      .ToListAsync();
+            var query = _context.Meals.Include(m => m.Category).AsQueryable();
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(m => EF.Functions.Like(m.Name, $"%{name}%"));
+            }
+
+            if (FilterCategory.HasValue)
+            {
+                query = query.Where(m => m.CategoryId == FilterCategory.Value);
+            }
+
+            if (calories.HasValue)
+            {
+                query = query.Where(m => m.Calories <= calories.Value);
+            }
+
+            //var sqlQuery = query.ToQueryString();
+            //Console.WriteLine($"Generated SQL Query: {sqlQuery}");
+
+            var meals = await query.ToListAsync();
+
+            ViewData["FilterName"] = name;
+            ViewData["FilterCategory"] = FilterCategory;
+            ViewData["FilterCalories"] = calories;
+
+            ViewBag.Categories = await _context.MealCategories.ToListAsync();
 
             return View(meals);
         }
-
 
         public async Task<IActionResult> Create()
         {

@@ -13,7 +13,6 @@ public class MealService : IMealService
         _context = context;
     }
 
-    // Pobieranie posiłków użytkownika
     public async Task<List<Meal>> GetMealsByUserAsync(string userId)
     {
         return await _context.Meals
@@ -22,8 +21,6 @@ public class MealService : IMealService
                              .ThenInclude(mp => mp.Product)
                              .ToListAsync();
     }
-
-    // Pobieranie posiłku po jego ID
     public async Task<Meal> GetMealByIdAsync(int mealId)
     {
         return await _context.Meals
